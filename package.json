@@ -1,14 +1,19 @@
 {
   "name": "gotofolder",
   "displayName": "Go to Folder",
-  "description": "",
-  "keywords": [],
+  "description": "Quick go to folder.",
+  "keywords": [
+    "quick",
+    "open folder"
+  ],
   "version": "0.0.1",
   "publisher": "zjffun",
   "engines": {
     "vscode": "^1.59.0"
   },
-  "categories": [],
+  "categories": [
+    "Other"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zjffun/vscode-go-to-folder.git"
