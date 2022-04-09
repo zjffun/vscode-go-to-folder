@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+### v0.0.2
+
+- Update info.
+
 ### v0.0.1
 
 - Added features go to folder.
