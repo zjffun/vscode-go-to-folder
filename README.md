@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+### v0.0.5
+
+- Fix title of QuickPick.
+
 ### v0.0.4
 
 - Added features go to file.

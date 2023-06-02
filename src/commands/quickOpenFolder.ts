@@ -14,6 +14,14 @@ const fileTypeName = {
   66: "directory(symbolic link(directory)",
 };
 
+function getQuickPickTitle({ wsPath }: { wsPath?: string } = {}) {
+  if (!wsPath) {
+    return "Go to Folder...";
+  }
+
+  return `Go to Folder... [${wsPath}]`;
+}
+
 function getWorkspaceFolderPickItems() {
   if (!vscode.workspace.workspaceFolders) {
     return undefined;
@@ -92,7 +100,9 @@ async function showPick(uri: vscode.Uri) {
     }
 
     const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
-      title: `Go to Folder... [${wsPath}]`,
+      title: getQuickPickTitle({
+        wsPath,
+      }),
     });
 
     if (!item) {
@@ -113,12 +123,13 @@ async function showPick(uri: vscode.Uri) {
 }
 
 async function showDefaultPick() {
+  let wsPath;
   let items: FolderQuickPickItem[] = [];
 
   const activeUri = vscode.window.activeTextEditor?.document.uri;
   if (activeUri) {
     const activeFolderUri = vscode.Uri.joinPath(activeUri, "..");
-    const wsPath = getWorkspacePath(activeFolderUri);
+    wsPath = getWorkspacePath(activeFolderUri);
     if (wsPath) {
       const activeItems = await getPickItems(activeFolderUri, wsPath);
       items = items.concat(activeItems);
@@ -139,7 +150,7 @@ async function showDefaultPick() {
   }
 
   const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
-    title: "Go to Folder...",
+    title: getQuickPickTitle({ wsPath }),
   });
 
   if (item) {
