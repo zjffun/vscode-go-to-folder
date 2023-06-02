@@ -32,8 +32,7 @@
       "explorer/context": [
         {
           "command": "gotofolder.quickOpenFolder",
-          "group": "4_search@99",
-          "when": "explorerResourceIsFolder"
+          "group": "4_search@99"
         }
       ],
       "commandPalette": [

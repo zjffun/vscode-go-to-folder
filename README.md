@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+### v0.0.4
+
+- Added features go to file.
+
 ### v0.0.3
 
 - Added features support using in browser editor.

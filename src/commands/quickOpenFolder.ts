@@ -1,8 +1,18 @@
 import * as vscode from "vscode";
 
 interface FolderQuickPickItem extends vscode.QuickPickItem {
-  folderUri: vscode.Uri;
+  type?: vscode.FileType;
+  uri: vscode.Uri;
 }
+
+const fileTypeName = {
+  0: "unknown",
+  1: "file",
+  2: "directory",
+  64: "symbolic link",
+  65: "file(symbolic link)",
+  66: "directory(symbolic link(directory)",
+};
 
 function getWorkspaceFolderPickItems() {
   if (!vscode.workspace.workspaceFolders) {
@@ -12,7 +22,7 @@ function getWorkspaceFolderPickItems() {
   const items: FolderQuickPickItem[] = [];
   for (const { uri, name } of vscode.workspace.workspaceFolders) {
     items.push({
-      folderUri: uri,
+      uri: uri,
       description: `#${name}`,
       label: `#${name}`,
     });
@@ -44,35 +54,38 @@ async function getPickItems(uri: vscode.Uri, wsPath: string) {
 
   if (wsPath.includes("/")) {
     items.push({
-      folderUri: vscode.Uri.joinPath(uri, ".."),
+      uri: vscode.Uri.joinPath(uri, ".."),
       description: wsPath.replace(/\/.*?$/, ""),
       label: "..",
     });
   }
 
-  for (const [fileName, fileType] of list) {
-    if (fileType & (vscode.FileType.Directory | vscode.FileType.SymbolicLink)) {
-      items.push({
-        folderUri: vscode.Uri.joinPath(uri, fileName),
-        description: `${wsPath}/${fileName}`,
-        label: fileName,
-      });
-    }
+  const sortedList = list.sort((a, b) => {
+    return b[1] - a[1];
+  });
+
+  for (const [fileName, fileType] of sortedList) {
+    items.push({
+      type: fileType,
+      uri: vscode.Uri.joinPath(uri, fileName),
+      description: `${fileTypeName[fileType]} - ${wsPath}/${fileName}`,
+      label: fileName,
+    });
   }
 
   return items;
 }
 
 async function showPick(uri: vscode.Uri) {
-  let uri_ = uri;
+  let currentUri = uri;
   while (true) {
-    const wsPath = getWorkspacePath(uri_);
+    const wsPath = getWorkspacePath(currentUri);
 
     if (!wsPath) {
       return;
     }
 
-    const items = await getPickItems(uri_, wsPath);
+    const items = await getPickItems(currentUri, wsPath);
 
     if (!items) {
       return;
@@ -87,9 +100,14 @@ async function showPick(uri: vscode.Uri) {
     }
 
     if (item) {
-      uri_ = item.folderUri;
-      await vscode.commands.executeCommand("revealInExplorer", item.folderUri);
+      currentUri = item.uri;
+      await vscode.commands.executeCommand("revealInExplorer", item.uri);
       await vscode.commands.executeCommand("list.expand");
+
+      if (item.type && item.type & vscode.FileType.File) {
+        await vscode.commands.executeCommand("vscode.open", item.uri);
+        continue;
+      }
     }
   }
 }
@@ -97,28 +115,27 @@ async function showPick(uri: vscode.Uri) {
 async function showDefaultPick() {
   let items: FolderQuickPickItem[] = [];
 
-  const workspaceItems = getWorkspaceFolderPickItems();
-  if (workspaceItems) {
-    items = items.concat(workspaceItems);
+  const activeUri = vscode.window.activeTextEditor?.document.uri;
+  if (activeUri) {
+    const activeFolderUri = vscode.Uri.joinPath(activeUri, "..");
+    const wsPath = getWorkspacePath(activeFolderUri);
+    if (wsPath) {
+      const activeItems = await getPickItems(activeFolderUri, wsPath);
+      items = items.concat(activeItems);
+    }
+  }
+
+  if (items.length > 0) {
     items.push({
-      folderUri: vscode.Uri.file(""),
+      uri: vscode.Uri.file(""),
       kind: vscode.QuickPickItemKind.Separator,
       label: "",
     });
   }
 
-  const activeUri = vscode.window.activeTextEditor?.document.uri;
-  if (activeUri) {
-    const activateFolderUri = vscode.Uri.joinPath(activeUri, "..");
-    const activateFolderPath = getWorkspacePath(
-      vscode.Uri.joinPath(activeUri, "..")
-    );
-    if (activateFolderPath) {
-      items.push({
-        folderUri: activateFolderUri,
-        label: activateFolderPath,
-      });
-    }
+  const workspaceItems = getWorkspaceFolderPickItems();
+  if (workspaceItems) {
+    items = items.concat(workspaceItems);
   }
 
   const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
@@ -126,7 +143,7 @@ async function showDefaultPick() {
   });
 
   if (item) {
-    await showPick(item.folderUri);
+    await showPick(item.uri);
   }
 }
 
@@ -136,7 +153,14 @@ export default async (uri?: vscode.Uri) => {
     return true;
   }
 
-  await showPick(uri);
+  let _uri = uri;
+
+  const stat = await vscode.workspace.fs.stat(uri);
+  if (stat.type !== vscode.FileType.Directory) {
+    _uri = vscode.Uri.joinPath(uri, "..");
+  }
+
+  await showPick(_uri);
   return true;
 };
 
