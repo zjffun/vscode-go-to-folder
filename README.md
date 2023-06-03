@@ -24,6 +24,12 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+## v0.0.6
+
+- Added features pick root dir.
+- Fix pick symbolic link dir wrong.
+- Fix direct pick file doesn't take effect.
+
 ### v0.0.5
 
 - Fix title of QuickPick.

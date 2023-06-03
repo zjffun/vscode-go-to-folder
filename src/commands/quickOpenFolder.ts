@@ -5,7 +5,9 @@ interface FolderQuickPickItem extends vscode.QuickPickItem {
   uri: vscode.Uri;
 }
 
-const fileTypeName = {
+const doubleDotPath = "..";
+
+const fileTypeName: Record<string, string> = {
   0: "unknown",
   1: "file",
   2: "directory",
@@ -14,15 +16,39 @@ const fileTypeName = {
   66: "directory(symbolic link(directory)",
 };
 
-function getQuickPickTitle({ wsPath }: { wsPath?: string } = {}) {
-  if (!wsPath) {
+function getQuickPickTitle({ shortPath }: { shortPath?: string } = {}) {
+  if (!shortPath) {
     return "Go to Folder...";
   }
 
-  return `Go to Folder... [${wsPath}]`;
+  return `Go to Folder... [${shortPath}]`;
 }
 
-function getWorkspaceFolderPickItems() {
+function getQuickPickDesc(
+  {
+    fileType,
+    shortPath,
+    fileName,
+  }: { fileType?: vscode.FileType; shortPath: string; fileName: string } = {
+    fileName: "",
+    shortPath: "",
+  }
+) {
+  let desc = "";
+
+  if (fileType && fileTypeName[fileType]) {
+    desc += `${fileTypeName[fileType]} - `;
+  }
+
+  const shortPathUri = vscode.Uri.from({ scheme: "file", path: shortPath });
+  const fileNameUri = vscode.Uri.joinPath(shortPathUri, fileName);
+
+  desc += fileNameUri.path;
+
+  return desc;
+}
+
+function getWorkspaceFolderQuickPickItems() {
   if (!vscode.workspace.workspaceFolders) {
     return undefined;
   }
@@ -31,7 +57,11 @@ function getWorkspaceFolderPickItems() {
   for (const { uri, name } of vscode.workspace.workspaceFolders) {
     items.push({
       uri: uri,
-      description: `#${name}`,
+      description: getQuickPickDesc({
+        fileType: vscode.FileType.Directory,
+        shortPath: `#${name}`,
+        fileName: "",
+      }),
       label: `#${name}`,
     });
   }
@@ -39,32 +69,34 @@ function getWorkspaceFolderPickItems() {
   return items;
 }
 
-function getWorkspacePath(uri: vscode.Uri) {
+function getShortPath(path: string) {
   if (!vscode.workspace.workspaceFolders) {
-    return undefined;
+    return path;
   }
 
-  const dirPath = uri.path;
-
   for (const { uri, name } of vscode.workspace.workspaceFolders) {
-    const wsPath = uri.path;
-    if (dirPath.startsWith(wsPath)) {
-      return dirPath.replace(wsPath, `#${name}`);
+    const workspacePath = uri.path;
+    if (path.startsWith(workspacePath)) {
+      return path.replace(workspacePath, `#${name}`);
     }
   }
 
-  return undefined;
+  return path;
 }
 
-async function getPickItems(uri: vscode.Uri, wsPath: string) {
+async function getQuickPickItems(uri: vscode.Uri, shortPath: string) {
   const list = await vscode.workspace.fs.readDirectory(uri);
   const items: FolderQuickPickItem[] = [];
 
-  if (wsPath.includes("/")) {
+  if (shortPath.includes("/")) {
     items.push({
-      uri: vscode.Uri.joinPath(uri, ".."),
-      description: wsPath.replace(/\/.*?$/, ""),
-      label: "..",
+      uri: vscode.Uri.joinPath(uri, doubleDotPath),
+      description: getQuickPickDesc({
+        fileType: vscode.FileType.Directory,
+        shortPath,
+        fileName: doubleDotPath,
+      }),
+      label: doubleDotPath,
     });
   }
 
@@ -76,7 +108,11 @@ async function getPickItems(uri: vscode.Uri, wsPath: string) {
     items.push({
       type: fileType,
       uri: vscode.Uri.joinPath(uri, fileName),
-      description: `${fileTypeName[fileType]} - ${wsPath}/${fileName}`,
+      description: getQuickPickDesc({
+        fileType,
+        shortPath,
+        fileName,
+      }),
       label: fileName,
     });
   }
@@ -84,54 +120,49 @@ async function getPickItems(uri: vscode.Uri, wsPath: string) {
   return items;
 }
 
-async function showPick(uri: vscode.Uri) {
-  let currentUri = uri;
-  while (true) {
-    const wsPath = getWorkspacePath(currentUri);
+async function pickItem(item: FolderQuickPickItem) {
+  const uri = item.uri;
 
-    if (!wsPath) {
-      return;
-    }
+  await vscode.commands.executeCommand("revealInExplorer", uri);
+  await vscode.commands.executeCommand("list.expand");
 
-    const items = await getPickItems(currentUri, wsPath);
+  if (item.type && item.type & vscode.FileType.File) {
+    await vscode.commands.executeCommand("vscode.open", uri);
+  }
 
-    if (!items) {
-      return;
-    }
+  await showQuickPick(uri);
+}
 
-    const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
-      title: getQuickPickTitle({
-        wsPath,
-      }),
-    });
+async function showQuickPick(uri: vscode.Uri) {
+  const shortPath = getShortPath(uri.path);
 
-    if (!item) {
-      return;
-    }
+  const items = await getQuickPickItems(uri, shortPath);
 
-    if (item) {
-      currentUri = item.uri;
-      await vscode.commands.executeCommand("revealInExplorer", item.uri);
-      await vscode.commands.executeCommand("list.expand");
+  if (!items) {
+    return;
+  }
 
-      if (item.type && item.type & vscode.FileType.File) {
-        await vscode.commands.executeCommand("vscode.open", item.uri);
-        continue;
-      }
-    }
+  const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
+    title: getQuickPickTitle({
+      shortPath,
+    }),
+  });
+
+  if (item) {
+    pickItem(item);
   }
 }
 
-async function showDefaultPick() {
-  let wsPath;
+async function showDefaultQuickPick() {
+  let shortPath;
   let items: FolderQuickPickItem[] = [];
 
   const activeUri = vscode.window.activeTextEditor?.document.uri;
-  if (activeUri) {
-    const activeFolderUri = vscode.Uri.joinPath(activeUri, "..");
-    wsPath = getWorkspacePath(activeFolderUri);
-    if (wsPath) {
-      const activeItems = await getPickItems(activeFolderUri, wsPath);
+  if (activeUri && activeUri.scheme !== "untitled") {
+    const activeDirUri = vscode.Uri.joinPath(activeUri, "..");
+    shortPath = getShortPath(activeDirUri.path);
+    if (shortPath) {
+      const activeItems = await getQuickPickItems(activeDirUri, shortPath);
       items = items.concat(activeItems);
     }
   }
@@ -144,34 +175,43 @@ async function showDefaultPick() {
     });
   }
 
-  const workspaceItems = getWorkspaceFolderPickItems();
+  const workspaceItems = getWorkspaceFolderQuickPickItems();
   if (workspaceItems) {
+    items.push({
+      uri: vscode.Uri.file("/"),
+      description: getQuickPickDesc({
+        fileType: vscode.FileType.Directory,
+        shortPath: `/`,
+        fileName: "",
+      }),
+      label: `/`,
+    });
     items = items.concat(workspaceItems);
   }
 
   const item = await vscode.window.showQuickPick<FolderQuickPickItem>(items, {
-    title: getQuickPickTitle({ wsPath }),
+    title: getQuickPickTitle({ shortPath }),
   });
 
   if (item) {
-    await showPick(item.uri);
+    await pickItem(item);
   }
 }
 
 export default async (uri?: vscode.Uri) => {
   if (!uri) {
-    await showDefaultPick();
+    await showDefaultQuickPick();
     return true;
   }
 
-  let _uri = uri;
+  let dirUri = uri;
 
   const stat = await vscode.workspace.fs.stat(uri);
-  if (stat.type !== vscode.FileType.Directory) {
-    _uri = vscode.Uri.joinPath(uri, "..");
+  if (!(stat.type & vscode.FileType.Directory)) {
+    dirUri = vscode.Uri.joinPath(uri, "..");
   }
 
-  await showPick(_uri);
+  await showQuickPick(dirUri);
   return true;
 };
 
