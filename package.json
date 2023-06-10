@@ -41,8 +41,7 @@
       ],
       "commandPalette": [
         {
-          "command": "gotofolder.quickOpenFolder",
-          "when": "workspaceFolderCount >= 1"
+          "command": "gotofolder.quickOpenFolder"
         }
       ]
     },

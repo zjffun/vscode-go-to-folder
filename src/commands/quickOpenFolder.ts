@@ -175,17 +175,18 @@ async function showDefaultQuickPick() {
     });
   }
 
+  items.push({
+    uri: vscode.Uri.file("/"),
+    description: getQuickPickDesc({
+      fileType: vscode.FileType.Directory,
+      shortPath: `/`,
+      fileName: "",
+    }),
+    label: `/`,
+  });
+
   const workspaceItems = getWorkspaceFolderQuickPickItems();
   if (workspaceItems) {
-    items.push({
-      uri: vscode.Uri.file("/"),
-      description: getQuickPickDesc({
-        fileType: vscode.FileType.Directory,
-        shortPath: `/`,
-        fileName: "",
-      }),
-      label: `/`,
-    });
     items = items.concat(workspaceItems);
   }
 
