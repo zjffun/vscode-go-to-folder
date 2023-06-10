@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+## v0.0.8
+
+Prefers to run as a workspace extension.
+
 ## v0.0.7
 
 Prefers to run as a UI extension.
