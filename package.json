@@ -27,6 +27,10 @@
   ],
   "main": "./out/extension.js",
   "browser": "./dist/web/extension.js",
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "contributes": {
     "menus": {
       "explorer/context": [

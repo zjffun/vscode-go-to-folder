@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+## v0.0.7
+
+Prefers to run as a UI extension.
+
 ## v0.0.6
 
 - Added features pick root dir.
