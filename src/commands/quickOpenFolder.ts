@@ -84,8 +84,13 @@ function getShortPath(path: string) {
   return path;
 }
 
+function showError(error: any) {
+  vscode.window.showErrorMessage(
+    `Go to Folder ${error?.message || error?.toString?.()}`
+  );
+}
+
 async function getQuickPickItems(uri: vscode.Uri, shortPath: string) {
-  const list = await vscode.workspace.fs.readDirectory(uri);
   const items: FolderQuickPickItem[] = [];
 
   if (shortPath.includes("/")) {
@@ -98,6 +103,14 @@ async function getQuickPickItems(uri: vscode.Uri, shortPath: string) {
       }),
       label: doubleDotPath,
     });
+  }
+
+  let list: [string, vscode.FileType][] = [];
+  try {
+    list = await vscode.workspace.fs.readDirectory(uri);
+  } catch (error) {
+    showError(error);
+    return items;
   }
 
   const sortedList = list.sort((a, b) => {
@@ -149,7 +162,7 @@ async function showQuickPick(uri: vscode.Uri) {
   });
 
   if (item) {
-    pickItem(item);
+    await pickItem(item);
   }
 }
 
@@ -200,20 +213,25 @@ async function showDefaultQuickPick() {
 }
 
 export default async (uri?: vscode.Uri) => {
-  if (!uri) {
-    await showDefaultQuickPick();
+  try {
+    if (!uri) {
+      await showDefaultQuickPick();
+      return true;
+    }
+
+    let dirUri = uri;
+
+    const stat = await vscode.workspace.fs.stat(uri);
+    if (!(stat.type & vscode.FileType.Directory)) {
+      dirUri = vscode.Uri.joinPath(uri, "..");
+    }
+
+    await showQuickPick(dirUri);
     return true;
+  } catch (error: any) {
+    showError(error);
+    return false;
   }
-
-  let dirUri = uri;
-
-  const stat = await vscode.workspace.fs.stat(uri);
-  if (!(stat.type & vscode.FileType.Directory)) {
-    dirUri = vscode.Uri.joinPath(uri, "..");
-  }
-
-  await showQuickPick(dirUri);
-  return true;
 };
 
 export const quickOpenFolderId = "gotofolder.quickOpenFolder";
