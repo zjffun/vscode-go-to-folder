@@ -2,6 +2,8 @@
 
 Quick go to folder.
 
+[![video](./images/video.webp)](https://www.youtube.com/watch?v=ORRnb8-WRrc)
+
 ## Features
 
 ### Start go to folder by menu
