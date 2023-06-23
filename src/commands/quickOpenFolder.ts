@@ -141,6 +141,7 @@ async function pickItem(item: FolderQuickPickItem) {
 
   if (item.type && item.type & vscode.FileType.File) {
     await vscode.commands.executeCommand("vscode.open", uri);
+    return;
   }
 
   await showQuickPick(uri);

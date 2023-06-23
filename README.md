@@ -24,6 +24,10 @@ code --install-extension zjffun.gotofolder
 
 ### [Unreleased]
 
+## v0.1.1
+
+Fix error when select go to a file.
+
 ## v0.1.0
 
 Handle error.
