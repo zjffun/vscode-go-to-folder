@@ -14,6 +14,10 @@ Quick go to folder.
 
 ![Go to folder by command palette](images/go-to-folder-by-command-palette.webp)
 
+### Open folder in new window
+
+![Open folder in new window](images/open-folder-in-new-window.webp)
+
 ## Install via CLI
 
 ```bash
@@ -25,6 +29,10 @@ code --install-extension zjffun.gotofolder
 ### [TODO]
 
 ### [Unreleased]
+
+## v0.1.2
+
+Added features open folder in new window.
 
 ## v0.1.1
 
