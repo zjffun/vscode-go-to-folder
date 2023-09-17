@@ -4,7 +4,7 @@
 
 快速定位到文件夹。
 
-[![video](./images/video.webp)](https://www.youtube.com/watch?v=ORRnb8-WRrc)
+[![video](./images/video-bilibili.webp)](https://www.bilibili.com/video/BV1Kg4y1N7JV)
 
 ## 功能
 
