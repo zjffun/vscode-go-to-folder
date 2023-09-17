@@ -2,25 +2,25 @@
 
 [English](./README.md) | 简体中文
 
-Quick go to folder.
+快速定位到文件夹。
 
 [![video](./images/video.webp)](https://www.youtube.com/watch?v=ORRnb8-WRrc)
 
-## Features
+## 功能
 
-### Start go to folder by menu
+### 通过右键菜单打开
 
 ![Go to folder by menu](images/go-to-folder-by-menu.webp)
 
-### Start go to folder by command palette
+### 通过命令面板打开
 
 ![Go to folder by command palette](images/go-to-folder-by-command-palette.webp)
 
-### Open folder in new window
+### 在新窗口中打开文件夹
 
 ![Open folder in new window](images/open-folder-in-new-window.webp)
 
-## Install via CLI
+## 通过命令行安装
 
 ```bash
 code --install-extension zjffun.gotofolder
