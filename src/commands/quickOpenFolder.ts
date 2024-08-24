@@ -22,7 +22,7 @@ quickPick.onDidAccept(
     if (item) {
       await acceptItem(item);
     }
-  })
+  }),
 );
 
 quickPick.onDidTriggerItemButton(
@@ -55,8 +55,8 @@ quickPick.onDidTriggerItemButton(
         quickPick.hide();
         return;
       }
-    }
-  )
+    },
+  ),
 );
 
 const fileTypeName: Record<string, string> = {
@@ -70,10 +70,11 @@ const fileTypeName: Record<string, string> = {
 
 function showError(error: any) {
   vscode.window.showErrorMessage(
-    `Go to Folder ${error?.message || error?.toString?.()}`
+    `Go to Folder ${error?.message || error?.toString?.()}`,
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function getShowErrorFunction(this: any, fn: Function) {
   const _this = this;
 
@@ -104,7 +105,7 @@ function getQuickPickDesc(
   }: { fileType?: vscode.FileType; shortPath: string; fileName: string } = {
     fileName: "",
     shortPath: "",
-  }
+  },
 ) {
   let desc = "";
 
@@ -137,7 +138,7 @@ function getWorkspaceFolderQuickPickItems() {
           fileName: "",
         }),
         label: `#${name}`,
-      })
+      }),
     );
   }
 
@@ -224,7 +225,7 @@ async function getQuickPickItems(uri: vscode.Uri, shortPath: string) {
           fileName: doubleDotPath,
         }),
         label: doubleDotPath,
-      })
+      }),
     );
   }
 
@@ -251,7 +252,7 @@ async function getQuickPickItems(uri: vscode.Uri, shortPath: string) {
           fileName,
         }),
         label: fileName,
-      })
+      }),
     );
   }
 
@@ -331,7 +332,7 @@ async function showDefaultQuickPick() {
         fileName: "",
       }),
       label: `/`,
-    })
+    }),
   );
 
   const workspaceItems = getWorkspaceFolderQuickPickItems();

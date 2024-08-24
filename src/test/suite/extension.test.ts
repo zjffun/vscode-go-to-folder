@@ -6,9 +6,7 @@ suite("Extension", () => {
   const extensionID = "zjffun.gotofolder";
   const extensionShortName = "gotofolder";
 
-  let extension: vscode.Extension<any> | undefined;
-
-  extension = vscode.extensions.getExtension(extensionID);
+  const extension = vscode.extensions.getExtension(extensionID);
 
   setup(async () => {});
 
@@ -20,13 +18,13 @@ suite("Extension", () => {
     }
 
     const packageCommands = extension.packageJSON.contributes.commands.map(
-      (c: any) => c.command
+      (c: any) => c.command,
     );
 
     // get all extension commands excluding internal commands.
     vscode.commands.getCommands(true).then((allCommands) => {
       const activeCommands = allCommands.filter((c) =>
-        c.startsWith(`${extensionShortName}.`)
+        c.startsWith(`${extensionShortName}.`),
       );
 
       activeCommands.forEach((command) => {
