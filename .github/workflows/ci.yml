@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -10,14 +12,28 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Prepare git
+        run: |-
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 20.x
       - run: yarn install
-      - run: xvfb-run -a yarn test
+      - name: Eslint & Prettier
+        run: |
+          npx eslint
+          npx prettier --check .
+      - name: Compile
+        run: |
+          yarn run compile
+          yarn run compile-web
+      - name: Test
+        run: xvfb-run -a yarn run test
         if: runner.os == 'Linux'
-      - run: yarn test
+      - name: Test
+        run: yarn run test
         if: runner.os != 'Linux'

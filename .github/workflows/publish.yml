@@ -17,7 +17,12 @@ jobs:
         with:
           node-version: 20.x
       - run: yarn install
-      - run: xvfb-run -a yarn test
+      - name: Compile
+        run: |
+          yarn run compile
+          yarn run compile-web
+      - name: Test
+        run: xvfb-run -a yarn test
       - name: Publish
         if: success()
         run: yarn run deploy
