@@ -55,12 +55,12 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTest.js && yarn run test-web",
+    "test": "node ./out/test/runTest.js",
     "eslint-fix": "eslint --fix .",
     "prettier-fix": "prettier --write .",
     "watch-web": "webpack --watch",
     "compile-web": "webpack --mode production --devtool hidden-source-map",
-    "test-web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
+    "test-web": "vscode-test-web --extensionDevelopmentPath=. --extensionTestsPath=./dist/web/test/suite/index.js",
     "_vscode:pack": "vsce package",
     "_vscode:install": "ls gotofolder-*.vsix | xargs code --install-extension",
     "_vscode:uninstall": "code --uninstall-extension zjffun.gotofolder"
@@ -72,7 +72,7 @@
     "@types/vscode": "^1.59.0",
     "@types/webpack-env": "^1.18.0",
     "@vscode/test-electron": "^2.3.9",
-    "@vscode/test-web": "^0.0.54",
+    "@vscode/test-web": "^0.0.56",
     "@vscode/vsce": "^2.26.0",
     "assert": "^2.0.0",
     "eslint": "^9.9.1",
