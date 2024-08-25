@@ -24,7 +24,7 @@ jobs:
       - name: Test
         run: |
           xvfb-run -a yarn run test
-          yarn run test-web
+          xvfb-run -a yarn run test-web
       - name: Publish
         if: success()
         run: yarn run deploy
