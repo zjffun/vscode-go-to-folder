@@ -27,7 +27,7 @@ jobs:
           xvfb-run -a yarn run test-web
       - name: Publish
         if: success()
-        run: yarn run deploy
+        run: npx vsce publish --yarn
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
       - name: Publish to Open VSX Registry
