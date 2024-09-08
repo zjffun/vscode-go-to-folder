@@ -25,3 +25,5 @@ Quick go to folder.
 ```bash
 code --install-extension zjffun.gotofolder
 ```
+
+## [Release Notes](./CHANGELOG.md)

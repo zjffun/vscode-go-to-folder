@@ -25,3 +25,5 @@
 ```bash
 code --install-extension zjffun.gotofolder
 ```
+
+## [更新日志](./CHANGELOG.md)
