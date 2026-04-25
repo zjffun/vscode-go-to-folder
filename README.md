@@ -2,6 +2,13 @@
 
 English | [简体中文](./README.zh-CN.md)
 
+[![Visual Studio Marketplace Version](https://vsmarketplacebadges.dev/version/zjffun.gotofolder.svg)](https://marketplace.visualstudio.com/items?itemName=zjffun.gotofolder)
+[![Visual Studio Marketplace Installs](https://vsmarketplacebadges.dev/installs/zjffun.gotofolder.svg)](https://marketplace.visualstudio.com/items?itemName=zjffun.gotofolder)
+[![Visual Studio Marketplace Downloads](https://vsmarketplacebadges.dev/downloads/zjffun.gotofolder.svg)](https://marketplace.visualstudio.com/items?itemName=zjffun.gotofolder)
+[![Visual Studio Marketplace Rating](https://vsmarketplacebadges.dev/rating/zjffun.gotofolder.svg)](https://marketplace.visualstudio.com/items?itemName=zjffun.gotofolder&ssr=false#review-details)
+[![Open VSX Version](https://img.shields.io/open-vsx/v/zjffun/gotofolder?label=Open%20VSX)](https://open-vsx.org/extension/zjffun/gotofolder)
+[![License](https://img.shields.io/github/license/zjffun/vscode-go-to-folder)](./LICENSE)
+
 Quick go to folder.
 
 [![video](./images/video.webp)](https://www.youtube.com/watch?v=ORRnb8-WRrc)
